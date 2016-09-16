@@ -2,17 +2,17 @@ var pomodoroApp = angular.module("PomodoroTimer", []);
 
 pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
 
+  $scope.time = null;
+  $scope.timerFn = null;
   $scope.collectTimerInformation = function() {
     var info = {
       timer: $('#pomodoroTime')[0].value,
       pomodori: $('#pomodori')[0].value,
     };
-    var time = null;
 
-    console.log(info);
     $scope.timerInfo = info;
-    time = calculateTime(info.timer, info.pomodori);
-    setTime(time);
+    $scope.time = calculateTime(info.timer, info.pomodori);
+    setTime($scope.time);
   };
 
   calculateTime = function(minutes, pomodori) {
@@ -28,11 +28,17 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
   };
 
   $scope.startTime = function() {
-    console.log("Time Started");
-    time = 600;
-    while(time > 0) {
-      time--;
-    }
+    $scope.timerFn = setInterval(decrementTime.bind(this), 1000);
+  };
+
+  $scope.pauseTime = function() {
+    clearInterval($scope.timerFn);
+  };
+
+  decrementTime = function() {
+    $scope.time.subtract(1, "seconds");
+    if($scope.time.asSeconds() > 0)
+      setTime($scope.time);
   };
 
 }]);
