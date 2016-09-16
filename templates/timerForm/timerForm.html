@@ -1,13 +1,15 @@
 <div class="col-xs-12">
   <form>
     <div class="form-group">
-      <label for="Timer"> Pomodoro Time </label>
-      <input type="text" id="pomodoroTime" placeholder="30"></div>
+      <label for="Timer"> Pomodoro Time (Minutes) </label>
+      <input type="number" id="pomodoroTime" placeholder="25" min="5" max="60"></div>
     </div>
     <div class="form-group">
-      <label for="Number of Pomodoro">Number of Pomodori</label>
-      <input type="number" id="pomodoroNum" placeholder="1">
+      <label for="Pomodori">Number of Pomodori</label>
+      <input type="number" id="pomodori" placeholder="1">
     </div>
-    <button type="submit" class="btn btn-default"> Start </button>
+    <div class="col-xs-offset-4 col-xs-4">
+      <button type="submit" class="btn btn-default" ng-click="collectTimerInformation()"> Set Time </button>
+    </div>
   </form>
 </div>
