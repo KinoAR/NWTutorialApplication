@@ -10,11 +10,12 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
     };
 
     Timer.calculateTime(info.timer, info.pomodori);
-    setDisplayTime(Timer.getTime());
+    setDisplayTimes(Timer.getTime(), Timer.getTaskTime());
   };
 
-  setDisplayTime = function(time) {
+  setDisplayTimes = function(time, taskTime) {
     $('#activeTimer')[0].textContent = time;
+    $('#taskTimer')[0].textContent = taskTime;
   };
 
   $scope.startTime = function() {
@@ -31,7 +32,9 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
 
   decrementTime = function() {
     Timer.decrementTime();
-    setDisplayTime(Timer.getTime());
+    Timer.addTaskTime();
+    setDisplayTimes(Timer.getTime(), Timer.getTaskTime());
+
   };
 
 }]);
