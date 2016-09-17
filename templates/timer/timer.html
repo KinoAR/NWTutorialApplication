@@ -1,11 +1,13 @@
 <div class="col-xs-12 text-center">
   <h1 id="activeTimer">0:00</h1>
   <form>
-    <div class="col-xs-offset-4 col-xs-4">
-      <button type="submit" class="btn btn-default" ng-click="startTime()"> Start Pomodoro </button>
-    </div>
-    <div class="col-xs-4">
-      <button type="submit" class="btn btn-default" ng-click="pauseTime()"> Pause </button>
+    <div class="btn-group btn-group-justified col-xs-12" role="group">
+      <div class="btn-group">
+        <button type="submit" class="btn btn-default" id="startTimer" ng-click="startTime()"> Start </button>
+      </div>
+      <div class="btn-group">
+        <button type="submit" class="btn btn-default" id="pauseTimer" ng-click="pauseTime()"> Pause </button>
+      </div>
     </div>
   </form>
 </div>
