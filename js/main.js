@@ -7,9 +7,14 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
     var info = {
       timer: $('#pomodoroTime')[0].value,
       pomodori: $('#pomodori')[0].value,
+      breakTimeLength: $("#breakTime")[0].value,
+      breakTimeExtendedLength: $("#breakTimeExtended")[0].value,
     };
 
+    console.log(info);
     Timer.calculateTime(info.timer, info.pomodori);
+    Timer.setBreakTimeLengths(info.breakTimeLength, info.breakTimeExtendedLength);
+    Timer.initializeTimers();
     setDisplayTimes(Timer.getTime(), Timer.getTaskTime());
   };
 
@@ -19,7 +24,7 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
   };
 
   $scope.startTime = function() {
-    $scope.timerFn = setInterval(decrementTime.bind(this), 1000);
+    $scope.timerFn = setInterval(processTimers.bind(this), 1000);
     disableButton("#startTimer");
     enableButton("#pauseTimer");
   };
@@ -30,11 +35,24 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
     enableButton("#startTimer");
   };
 
-  decrementTime = function() {
-    Timer.decrementTime();
-    Timer.addTaskTime();
-    setDisplayTimes(Timer.getTime(), Timer.getTaskTime());
-
+  processTimers = function() {
+    if(Timer.isBreakTime()) {
+      Timer.resetBreakTimers();
+      Timer.transitionToBreak();
+    }
+    if(Timer.isNotOnBreak()) {
+      Timer.decrementTime();
+      Timer.addTaskTime();
+      setDisplayTimes(Timer.getTime(), Timer.getTaskTime());
+    }
+    else if(Timer.isOnRegularBreak()) {
+      Timer.decrementBreakTime();
+      setDisplayTimes(Timer.getBreakTime(), Timer.getTaskTime());
+    }
+    else if(Timer.isOnExtendedBreak()) {
+      Timer.decrementBreakExtendedTime();
+      setDisplayTimes(Timer.getBreakTimeExtended(), Timer.getTaskTime());
+    }
   };
 
 }]);
