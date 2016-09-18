@@ -40,6 +40,12 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
       Timer.resetBreakTimers();
       Timer.transitionToBreak();
     }
+
+    if(Timer.isOnRegularBreak() || Timer.isOnExtendedBreak()) {
+      if(Timer.breakTime.asSeconds() <= 0 || Timer.breakTimeExtended.asSeconds() <= 0)
+        Timer.transitionToPomodoro();
+    }
+
     if(Timer.isNotOnBreak()) {
       Timer.decrementTime();
       Timer.addTaskTime();

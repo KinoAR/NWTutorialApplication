@@ -80,6 +80,10 @@ Timer.transitionToBreak = function() {
   this.breakCount += 1;
 };
 
+Timer.transitionToPomodoro = function() {
+  this.onBreak = false;
+};
+
 Timer.resetBreakTimers = function() {
   this.breakTime = moment.duration().add(this.breakTimeLength, "minutes");
   this.breakTimeExtended = moment.duration().add(this.breakTimeExtendedLength, "minutes");
@@ -121,7 +125,6 @@ Timer.getBreakTimeExtended = function() {
 };
 
 Timer.formatTime = function(time) {
-  console.log(time);
   var seconds = (time.seconds() > 9) ? time.seconds() : "0" + time.seconds();
   var minutes = (time.minutes() > 9) ? time.minutes() : "0" + time.minutes();
   var formattedTime = time.hours() + ":" + minutes + ":" + seconds; 
