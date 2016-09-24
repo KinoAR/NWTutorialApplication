@@ -3,7 +3,9 @@ function Timer() {
 }
 
 Timer.time = 0;
+Timer.decrementedTime = 0;
 Timer.pomodoroDuration = 0;
+Timer.activeTimer = null;
 Timer.totalTaskTime = moment.duration(0);
 Timer.breakTimeLength = 0;
 Timer.breakTimeExtendedLength = 0;
@@ -21,25 +23,23 @@ Timer.addTaskTime = function() {
   this.totalTaskTime.add(1, "seconds");
 };
 
+Timer.addToDecrementedTime = function() {
+  this.decrementedTime += 1;
+};
+
 Timer.addBreakCount = function() {
   this.breakCount += 1;
 };
 
 Timer.decrementTime = function() {
-  if(this.time.asSeconds() > 0)
-    this.time.subtract(1, "seconds");
+  if(this.activeTimer.asSeconds() > 0) {
+    this.activeTimer.subtract(1, "seconds");
+    this.addToDecrementedTime();
+  }
 };
 
 Timer.decrementTaskTime = function() {
   this.totalTaskTime.subtract(1, "seconds");
-};
-
-Timer.decrementBreakTime = function() {
-  this.breakTime.subtract(1, "seconds");
-};
-
-Timer.decrementBreakExtendedTime = function() {
-  this.breakTimeExtended.subtract(1, "seconds");
 };
 
 Timer.calculateTime = function(minutes, pomodori) {
@@ -75,13 +75,50 @@ Timer.isBreakTime = function() {
     return false;
 };
 
+Timer.transitionToPomodoro = function() {
+  this.onBreak = false;
+  this.setActiveTimer(this.time);
+  if(this.breakCount === 3)
+    this.resetBreakCount();
+};
+
+
 Timer.transitionToBreak = function() {
   this.onBreak = true;
   this.breakCount += 1;
+  this.processThirdBreak();
+  this.resetDecrementedTime();
+  if(this.thirdBreak === true )
+    this.setActiveTimer(this.breakTimeExtended);
+  else
+    this.setActiveTimer(this.breakTime);
 };
 
-Timer.transitionToPomodoro = function() {
-  this.onBreak = false;
+Timer.processThirdBreak = function() {
+  if(this.breakCount > 2)
+    this.thirdBreak = true;
+  else
+    this.thirdBreak = false;
+};
+
+Timer.resetTimer = function() {
+  if(this.isNotOnBreak()) {
+    this.resetPomodoroTime();
+    this.setActiveTimer(this.time);
+  }
+  if(this.isOnRegularBreak() || this.isOnExtendedBreak()) {
+    this.resetBreakTimers();
+    if(this.isOnRegularBreak())
+      this.setActiveTimer(this.breakTime);
+    else
+      this.setActiveTimer(this.breakTimeExtended);
+  }
+};
+
+
+Timer.resetPomodoroTime = function() {
+  this.time.add(this.decrementedTime, "seconds");
+  this.resetDecrementedTime();
 };
 
 Timer.resetBreakTimers = function() {
@@ -89,18 +126,26 @@ Timer.resetBreakTimers = function() {
   this.breakTimeExtended = moment.duration().add(this.breakTimeExtendedLength, "minutes");
 };
 
+Timer.resetDecrementedTime = function() {
+  this.decrementedTime = 0;
+};
+
 Timer.resetBreakCount = function() {
   this.breakCount = 0;
 };
 
 Timer.initializeTimers = function() {
-  Timer.totalTaskTime = moment.duration(0);
-  Timer.breakTime = moment.duration(0);
-  Timer.breakTimeExtended = moment.duration(0);
+  this.totalTaskTime = moment.duration(0);
+  this.breakTime = moment.duration(0);
+  this.breakTimeExtended = moment.duration(0);
 };
 
 Timer.setTime = function(time) {
   this.time = time;
+};
+
+Timer.setActiveTimer = function(time) {
+  this.activeTimer = time;
 };
 
 Timer.setBreakTimeLengths = function(breakTime, breakTimeExtended) {
@@ -109,19 +154,23 @@ Timer.setBreakTimeLengths = function(breakTime, breakTimeExtended) {
 };
 
 Timer.getTime = function() {
-  return this.formatTime(this.time);
+  return this.time;
 };
 
 Timer.getTaskTime = function() {
-  return this.formatTime(this.totalTaskTime);
+  return this.totalTaskTime;
 };
 
 Timer.getBreakTime = function() {
-  return this.formatTime(this.breakTime);
+  return this.breakTime;
 };
 
 Timer.getBreakTimeExtended = function() {
-  return this.formatTime(this.breakTimeExtended);
+  return this.breakTimeExtended;
+};
+
+Timer.getActiveTime = function() {
+  return this.activeTimer;
 };
 
 Timer.formatTime = function(time) {

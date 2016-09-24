@@ -15,12 +15,13 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
     Timer.calculateTime(info.timer, info.pomodori);
     Timer.setBreakTimeLengths(info.breakTimeLength, info.breakTimeExtendedLength);
     Timer.initializeTimers();
-    setDisplayTimes(Timer.getTime(), Timer.getTaskTime());
+    Timer.setActiveTimer(Timer.getTime());
+    setDisplayTimes();
   };
 
-  setDisplayTimes = function(time, taskTime) {
-    $('#activeTimer')[0].textContent = time;
-    $('#taskTimer')[0].textContent = taskTime;
+  setDisplayTimes = function() {
+    $('#activeTimer')[0].textContent = Timer.formatTime(Timer.getActiveTime());
+    $('#taskTimer')[0].textContent = Timer.formatTime(Timer.getTaskTime());
   };
 
   $scope.startTime = function() {
@@ -29,8 +30,18 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
     enableButton("#pauseTimer");
   };
 
+  $scope.resetTime = function() {
+    clearInterval($scope.timerFn);
+    Timer.resetTimer();
+    setDisplayTimes();
+    enableButton("#startTimer");
+    disableButton("#pauseTimer");
+  };
+
   $scope.pauseTime = function() {
     clearInterval($scope.timerFn);
+    pauseSound("#timerSound");
+    pauseSound("#alarmSound");
     disableButton("#pauseTimer");
     enableButton("#startTimer");
   };
@@ -39,25 +50,27 @@ pomodoroApp.controller('PomodoroTimerCtrl', ['$scope', function($scope){
     if(Timer.isBreakTime()) {
       Timer.resetBreakTimers();
       Timer.transitionToBreak();
+      pauseSound("#timerSound");
+      playSound("#alarmSound");
+      $scope.pauseTime();
     }
 
     if(Timer.isOnRegularBreak() || Timer.isOnExtendedBreak()) {
-      if(Timer.breakTime.asSeconds() <= 0 || Timer.breakTimeExtended.asSeconds() <= 0)
+      if(Timer.breakTime.asSeconds() <= 0 || Timer.breakTimeExtended.asSeconds() <= 0) {
+        $scope.pauseTime();
         Timer.transitionToPomodoro();
+      }
     }
 
+    setDisplayTimes();
     if(Timer.isNotOnBreak()) {
-      Timer.decrementTime();
       Timer.addTaskTime();
-      setDisplayTimes(Timer.getTime(), Timer.getTaskTime());
+      Timer.decrementTime();
+      playSound("#timerSound");
+      pauseSound("#alarmSound");
     }
-    else if(Timer.isOnRegularBreak()) {
-      Timer.decrementBreakTime();
-      setDisplayTimes(Timer.getBreakTime(), Timer.getTaskTime());
-    }
-    else if(Timer.isOnExtendedBreak()) {
-      Timer.decrementBreakExtendedTime();
-      setDisplayTimes(Timer.getBreakTimeExtended(), Timer.getTaskTime());
+    else {
+      Timer.decrementTime();
     }
   };
 

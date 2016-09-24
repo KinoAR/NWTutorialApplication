@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="/css/styles.css">
   </head>
   <body ng-controller="PomodoroTimerCtrl">
+    <audio id="timerSound">
+      <source src="/sound/clockTick.wav" type="audio/wav">
+    </audio>
+    <audio id="alarmSound">
+      <source src="/sound/alarm.wav" type="audio/wav">
+    </audio>
     <div class="main-content container">
       <div class="row">
         <div class="col-xs-12">
